@@ -56,7 +56,7 @@ avgProfit = round(((sum(changes)-changes[0])/(len(changes)-1)),2)
 
 
 # WRITING THE NEW CSV FILE
-outputPath = os.path.join("pybankOutput.txt")
+outputPath = os.path.join("analysis", "pybankOutput.txt")
 
 
 # open the file using "write" mode. Specify the variable to hold the contents
