@@ -6,11 +6,12 @@ import csv
 csvpath = os.path.join("Resources", "election_data.csv")
 
 
-# create counters
+# create totalVotes counter and winner var
 totalVotes = 0
-voteDict = {"Charles Casper Stockham": 0, "Diana DeGette": 0, "Raymon Anthony Doane": 0}
-votePercDict = {'Charles': 0, "Diana": 0, "Raymon": 0}
 winner = ' '
+
+# create specialized candidateDictionary with vote count and percentage
+candidateDict = {}
 
 # open the csv
 with open(csvpath, encoding='utf') as csvfile:
@@ -26,21 +27,26 @@ with open(csvpath, encoding='utf') as csvfile:
         # add one to total votes
         totalVotes += 1
 
-        # add to candidate's vote total
-        if row[2] == "Charles Casper Stockham":
-            voteDict["Charles Casper Stockham"] += 1
-        elif row[2] == "Diana DeGette":
-            voteDict["Diana DeGette"] += 1
+        # if candidate not in candidateDict, add them and start counting
+        # if candidate IS IN candidateDict add to candidate's vote total
+        if row[2] in candidateDict:
+            candidateDict[row[2]][0] += 1
         else:
-            voteDict["Raymon Anthony Doane"] += 1
+            candidateDict.setdefault(row[2], [0, 0])
+            candidateDict[row[2]][0] += 1
 
-    # calculate percentage of votes obtained by each candidate
-    votePercDict["Charles"] = round((voteDict["Charles Casper Stockham"]/totalVotes)*100, 3)
-    votePercDict['Diana'] = round((voteDict['Diana DeGette']/totalVotes)*100, 3)
-    votePercDict['Raymon'] = round((voteDict['Raymon Anthony Doane']/totalVotes)*100, 3)
+    # printing candidateDict for testing
+    print(candidateDict)
+
+    # calculate percentage and add it to second value of candidate's key in candidateDict
+    for key in candidateDict:
+        candidateDict[key][1] = round(((candidateDict[key][0]/totalVotes)*100),3)
+
+    # printing candidateDict for testing
+    print(candidateDict)
 
     # decide winner
-    winner = max(voteDict, key=voteDict.get)
+    winner = max(candidateDict, key=candidateDict.get)
 
 # WRITING NEW CSV FILE
 outputPath = os.path.join('analysis', 'pypollOutput.txt')
@@ -56,9 +62,8 @@ with open(outputPath, 'w') as txtfile:
     writer.writerow(["-------------------------"])
     writer.writerow([f'Total Votes: {totalVotes}'])
     writer.writerow(["-------------------------"])
-    writer.writerow([f'Charles Casper Stockham: {votePercDict["Charles"]}% ({voteDict["Charles Casper Stockham"]})'])
-    writer.writerow([f'Diana DeGette: {votePercDict["Diana"]}% ({voteDict["Diana DeGette"]})'])
-    writer.writerow([f'Raymon Anthony Doane: {votePercDict["Raymon"]}% ({voteDict["Raymon Anthony Doane"]})'])
+    for key, val1, in candidateDict.items():
+        writer.writerow([f'{key}: {val1[1]}% ({val1[0]})'])
     writer.writerow(["-------------------------"])
     writer.writerow([f'Winner: {winner}'])
     writer.writerow(["-------------------------"])
@@ -70,7 +75,6 @@ print("Election Results")
 print("-------------------------")
 print(f'Total Votes: {totalVotes}')
 print("-------------------------")
-print(f'Charles Casper Stockham: {votePercDict["Charles"]}% ({voteDict["Charles Casper Stockham"]})')
-print(f'Diana DeGette: {votePercDict["Diana"]}% ({voteDict["Diana DeGette"]})')
-print(f'Raymon Anthony Doane: {votePercDict["Raymon"]}% ({voteDict["Raymon Anthony Doane"]})')
+for key, val1, in candidateDict.items():
+    print(f'{key}: {val1[1]}% ({val1[0]})')
 print(f'Winner: {winner}')
